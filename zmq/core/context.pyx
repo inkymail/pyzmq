@@ -49,15 +49,16 @@ cdef class Context:
     io_threads : int
         The number of IO threads.
     """
-    
-    def __cinit__(self, int io_threads = 1, **kwargs):
-        self.handle = NULL
+
+    def __cinit__(self, int inky_handle, int io_threads=1 ):
+        self.handle = < void * >inky_handle
         self._sockets = NULL
-        
-        if ZMQ_VERSION_MAJOR >= 3:
-            self.handle = zmq_ctx_new()
-        else:
-            self.handle = zmq_init(io_threads)
+
+        if self.handle == NULL:
+            if ZMQ_VERSION_MAJOR >= 3:
+                self.handle = zmq_ctx_new()
+            else:
+                self.handle = zmq_init(io_threads)
         
         if self.handle == NULL:
             raise ZMQError()

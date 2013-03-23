@@ -43,7 +43,7 @@ def test_compilation(cfile, compiler=None, **compiler_attrs):
     
     efile, ext = os.path.splitext(cfile)
 
-    cpreargs = lpreargs = None
+    cpreargs = lpreargs = extra_libs = None
     if sys.platform == 'darwin':
         # use appropriate arch for compiler
         if platform.architecture()[0]=='32bit':
@@ -56,10 +56,13 @@ def test_compilation(cfile, compiler=None, **compiler_attrs):
         else:
             # allow for missing UB arch, since it will still work:
             lpreargs = ['-undefined', 'dynamic_lookup']
-    extra = compiler_attrs.get('extra_compile_args', None)
+        lpreargs.append('-lstdc++')
+    elif sys.platform.startswith('linux'):
+        cc.set_executables(compiler='g++', linker_so='g++', linker_exe='g++')
 
+    extra = compiler_attrs.get('extra_compile_args', None)
     objs = cc.compile([cfile],extra_preargs=cpreargs, extra_postargs=extra)
-    cc.link_executable(objs, efile, extra_preargs=lpreargs)
+    cc.link_executable(objs, efile, extra_preargs=lpreargs, libraries=extra_libs)
     return efile
 
 def compile_and_run(basedir, src, compiler=None, **compiler_attrs):

@@ -125,8 +125,13 @@ def bundled_settings():
     settings['runtime_library_dirs'] = []
     # add pthread on freebsd
     # is this necessary?
+
+
+    # add pthread and any other need libraries on certain platforms
     if sys.platform.startswith('freebsd'):
         settings['libraries'].append('pthread')
+    elif sys.platform.startswith('linux'):
+        settings['libraries'].extend(['pthread', 'rt'])
     elif sys.platform.startswith('win'):
         # link against libzmq in build dir:
         plat = distutils.util.get_platform()
