@@ -541,7 +541,8 @@ class Configure(build_ext):
         
         # first try with given config or defaults
         try:
-            self.check_zmq_version()
+            if not os.environ.get('cross_compiling'):
+                self.check_zmq_version()
         except Exception:
             etype, evalue, tb = sys.exc_info()
             # print the error as distutils would if we let it raise:
